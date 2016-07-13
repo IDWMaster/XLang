@@ -21,6 +21,7 @@ namespace XLANG_Windows
                  int *(int other);
                  int /(int other);
              }
+             int x = 5;
 ";
             Parser parser = new Parser(testProg);
             

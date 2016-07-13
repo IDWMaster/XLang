@@ -382,6 +382,7 @@ namespace XLANG_Windows
                 if (id == "struct")
                 {
                     XType type = Struct();
+                    Types[type.Name] = type;
                     ptr.ReadWhitespace();
                 }
                 else
@@ -429,6 +430,8 @@ namespace XLANG_Windows
 
             return FunctionBody(new XFunction());
         }
+        
+        public Dictionary<string, XType> Types = new Dictionary<string, XType>();
         public XFunction MainMethod;
 
         public Parser(string txt)
