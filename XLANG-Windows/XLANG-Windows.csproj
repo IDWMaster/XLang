@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASMEmit.cs" />
+    <Compile Include="ASMTreeBuilder.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Primitives.cs" />
     <Compile Include="Program.cs" />

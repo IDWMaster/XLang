@@ -132,12 +132,32 @@ namespace XLANG_Windows
         public int size; //Size of struct (or zero)
         public int alignment; //Alignment of struct
         public bool isStruct;
-
+        public Scope scope;
         static Dictionary<string, XType> types = new Dictionary<string, XType>();
         public Dictionary<string, XType> Fields = new Dictionary<string, XType>();
         public Dictionary<string, XFunction> Functions = new Dictionary<string, XFunction>();
-        public ResolvedType(string name)
+        public string GetQualifiedName()
         {
+            Queue<string> nameQueue = new Queue<string>();
+            Scope scope = this.scope;
+            while(scope != null)
+            {
+                if (scope.Name != "")
+                {
+                    nameQueue.Enqueue(scope.Name);
+                }
+                scope = scope.parent;
+            }
+            StringBuilder mbuilder = new StringBuilder();
+            while(nameQueue.Any())
+            {
+                mbuilder.Append(nameQueue.Dequeue());
+            }
+            return mbuilder.ToString()+"."+Name;
+        }
+        public ResolvedType(string name, Scope scope)
+        {
+            this.scope = scope;
             if (name != null)
             {
                 Name = name;
@@ -190,16 +210,20 @@ namespace XLANG_Windows
     }
     public class Scope
     {
+        //Name of scope, or NULL for global scope.
+        public string Name;
         public Dictionary<string, ResolvedType> types = new Dictionary<string, ResolvedType>(); 
         public Dictionary<string, Variable> locals = new Dictionary<string, Variable>();
         public Scope parent;
+        public List<Scope> childScopes = new List<Scope>();
         public Scope()
         {
-
+            
         }
         public Scope(Scope parent)
         {
             this.parent = parent;
+            parent.childScopes.Add(this);
         }
     }
 
@@ -209,6 +233,12 @@ namespace XLANG_Windows
         public List<Expression> Operations = new List<Expression>();
         public List<Variable> localVars = new List<Variable>();
         public Dictionary<string, Variable> args = new Dictionary<string, Variable>();
+        public XType ReturnType;
+        public string Name;
+        public XFunction(string name)
+        {
+            Name = name;
+        }
     }
     public class Expression : XObject
     {
@@ -349,7 +379,8 @@ namespace XLANG_Windows
                         Error("Expected '('.");
                     }
                     ptr.ReadWhitespace();
-                    XFunction func = new XFunction();
+                    XFunction func = new XFunction(funcName);
+                    func.ReturnType = new UnresolvedType(typename, func.Scope);
                     functionArgs(func);
                     type.Functions[funcName] = func;
                     ptr.ReadWhitespace();
@@ -373,9 +404,9 @@ namespace XLANG_Windows
             }
             return type;
         }
-        ResolvedType Struct()
+        ResolvedType Struct(Scope scope)
         {
-            ResolvedType retval = new ResolvedType(ptr.ExpectIdentifier());
+            ResolvedType retval = new ResolvedType(ptr.ExpectIdentifier(),scope);
             retval.isStruct = true;
             ptr.ReadWhitespace();
             ptr.Next();
@@ -409,7 +440,7 @@ namespace XLANG_Windows
                 ptr.ReadWhitespace();
                 if (id == "struct")
                 {
-                    ResolvedType type = Struct();
+                    ResolvedType type = Struct(scope);
                     scope.types[type.Name] = type;
                     ptr.ReadWhitespace();
                 }
@@ -456,7 +487,7 @@ namespace XLANG_Windows
         {
             ptr.ReadWhitespace();
 
-            return FunctionBody(new XFunction());
+            return FunctionBody(new XFunction(""));
         }
         
         public XFunction MainMethod;
