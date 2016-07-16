@@ -123,8 +123,12 @@ namespace XLANG_Windows
     {
         public XType objType; //Type of object
     }
-    public class XType : XObject
+    public abstract class XType : XObject
     {
+    }
+    public class ResolvedType:XType
+    {
+
         public int size; //Size of struct (or zero)
         public int alignment; //Alignment of struct
         public bool isStruct;
@@ -132,7 +136,7 @@ namespace XLANG_Windows
         static Dictionary<string, XType> types = new Dictionary<string, XType>();
         public Dictionary<string, XType> Fields = new Dictionary<string, XType>();
         public Dictionary<string, XFunction> Functions = new Dictionary<string, XFunction>();
-        public XType(string name)
+        public ResolvedType(string name)
         {
             if (name != null)
             {
@@ -142,12 +146,35 @@ namespace XLANG_Windows
         }
         public string Name;
     }
+    public class UnresolvedType:XType
+    {
+        public ResolvedType Resolve()
+        {
+            Scope scope = this.scope;
+            while(scope != null)
+            {
+                if(scope.types.ContainsKey(name))
+                {
+                    return scope.types[name];
+                }
+                scope = scope.parent;
+            }
+            return null;
+        }
+        Scope scope;
+        string name;
+        public UnresolvedType(string name, Scope scope)
+        {
+            this.scope = scope;
+            this.name = name;
+        }
+    }
 
     public abstract class Variable
     {
         public string Name;
-        public string Type;
-        public Variable(string name, string type)
+        public XType Type;
+        public Variable(string name, XType type)
         {
 
             Name = name;
@@ -156,13 +183,14 @@ namespace XLANG_Windows
     }
     public class LocalVariable : Variable
     {
-        public LocalVariable(string name, string type) : base(name, type)
+        public LocalVariable(string name, XType type) : base(name, type)
         {
 
         }
     }
     public class Scope
     {
+        public Dictionary<string, ResolvedType> types = new Dictionary<string, ResolvedType>(); 
         public Dictionary<string, Variable> locals = new Dictionary<string, Variable>();
         public Scope parent;
         public Scope()
@@ -279,11 +307,11 @@ namespace XLANG_Windows
                 {
                     case ',':
                         {
-                            func.args.Add(argName, new LocalVariable(argName, argType));
+                            func.args.Add(argName, new LocalVariable(argName, new UnresolvedType(argType,func.Scope)));
                         }
                         break;
                     case ')':
-                        func.args.Add(argName, new LocalVariable(argName, argType));
+                        func.args.Add(argName, new LocalVariable(argName, new UnresolvedType(argType,func.Scope)));
                         goto Velociraptor;
                     default:
                         Error("Expected ')'.");
@@ -296,7 +324,7 @@ namespace XLANG_Windows
 
             return func;
         }
-        XType ClassBody(XType type)
+        ResolvedType ClassBody(ResolvedType type)
         {
             while (ptr.Next())
             {
@@ -345,9 +373,9 @@ namespace XLANG_Windows
             }
             return type;
         }
-        XType Struct()
+        ResolvedType Struct()
         {
-            XType retval = new XType(ptr.ExpectIdentifier());
+            ResolvedType retval = new ResolvedType(ptr.ExpectIdentifier());
             retval.isStruct = true;
             ptr.ReadWhitespace();
             ptr.Next();
@@ -381,8 +409,8 @@ namespace XLANG_Windows
                 ptr.ReadWhitespace();
                 if (id == "struct")
                 {
-                    XType type = Struct();
-                    Types[type.Name] = type;
+                    ResolvedType type = Struct();
+                    scope.types[type.Name] = type;
                     ptr.ReadWhitespace();
                 }
                 else
@@ -394,7 +422,7 @@ namespace XLANG_Windows
                         //Variable declaration (local scope)
                         ptr.Prev();
                         string varName = ptr.ExpectIdentifier();
-                        var local = new LocalVariable(varName, id);
+                        var local = new LocalVariable(varName, new UnresolvedType(id,scope));
                         if (scope.locals.ContainsKey(varName))
                         {
                             Error("Invalid redeclaration of " + varName + ".");
@@ -431,7 +459,6 @@ namespace XLANG_Windows
             return FunctionBody(new XFunction());
         }
         
-        public Dictionary<string, XType> Types = new Dictionary<string, XType>();
         public XFunction MainMethod;
 
         public Parser(string txt)
