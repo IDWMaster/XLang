@@ -20,11 +20,11 @@ namespace XVM
             //Strings are NULL-terminated, UTF-8 encoded values
             //
             //Instruction encoding:
-            //OPCODE 0 -- Call function = (string)FunctionName
+            //OPCODE 0 -- Call function = (string)libName,(string)FunctionName
             //OPCODE 1 -- stloc.i where I is a 32-bit index of a local variable
             //OPCODE 2 -- ldloc.i where I is a 32-bit index of a local variable
             //OPCODE 3 -- ldconst.T where T is (string)TypeOfData = byte array prefixed with 32-bit length
-
+            
         }
     }
 }

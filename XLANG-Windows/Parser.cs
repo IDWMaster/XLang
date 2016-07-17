@@ -125,15 +125,20 @@ namespace XLANG_Windows
     }
     public abstract class XType : XObject
     {
+        public abstract ResolvedType Resolve();
     }
     public class ResolvedType:XType
     {
+        public override ResolvedType Resolve()
+        {
+            return this;
+        }
 
         public int size; //Size of struct (or zero)
         public int alignment; //Alignment of struct
         public bool isStruct;
         public Scope scope;
-        static Dictionary<string, XType> types = new Dictionary<string, XType>();
+        public static Dictionary<string, XType> types = new Dictionary<string, XType>();
         public Dictionary<string, XType> Fields = new Dictionary<string, XType>();
         public Dictionary<string, XFunction> Functions = new Dictionary<string, XFunction>();
         public string GetQualifiedName()
@@ -168,7 +173,7 @@ namespace XLANG_Windows
     }
     public class UnresolvedType:XType
     {
-        public ResolvedType Resolve()
+        public override ResolvedType Resolve()
         {
             Scope scope = this.scope;
             while(scope != null)
@@ -239,6 +244,30 @@ namespace XLANG_Windows
         {
             Name = name;
         }
+        public string GetQualifiedName()
+        {
+            Queue<string> nameQueue = new Queue<string>();
+            Scope scope = Scope;
+            while (scope != null)
+            {
+                if (scope.Name != "")
+                {
+                    nameQueue.Enqueue(scope.Name);
+                }
+                scope = scope.parent;
+            }
+            StringBuilder mbuilder = new StringBuilder();
+            while (nameQueue.Any())
+            {
+                mbuilder.Append(nameQueue.Dequeue());
+            }
+            return mbuilder.ToString() + "." + Name;
+        }
+    }
+    public class FunctionCallExpression:Expression
+    {
+        public XFunction function;
+        public List<Expression> arguments = new List<Expression>();
     }
     public class Expression : XObject
     {
@@ -264,11 +293,19 @@ namespace XLANG_Windows
         public char op;
         public Expression left;
         public Expression right;
+        public FunctionCallExpression ToFunctionCall()
+        {
+            FunctionCallExpression espn = new FunctionCallExpression(); //Extra-sensory perception network
+            espn.function = new XFunction(op.ToString());
+            espn.arguments.Add(left);
+            espn.arguments.Add(right);
+            return espn;
+        }
 
     }
     public class ConstantExpression : Expression
     {
-        object val;
+        public object val;
         public ConstantExpression(object val)
         {
             this.val = val;
@@ -491,13 +528,18 @@ namespace XLANG_Windows
         }
         
         public XFunction MainMethod;
+        ResolvedType XVoid;
 
         public Parser(string txt)
         {
+            XVoid = new ResolvedType("xvoid",null);
+            XVoid.isStruct = true;
+            XVoid.size = 0;
             CoreLibrary.Initialize();
             //Parse
             ptr = new StringPointer(txt);
             MainMethod = Main();
+            MainMethod.ReturnType = XVoid;
 
         }
     }

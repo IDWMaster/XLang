@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace XLANG_Windows
 {
@@ -24,7 +25,11 @@ namespace XLANG_Windows
              int x = 5;
 ";
             Parser parser = new Parser(testProg);
-            
+            ASMTreeBuilder builder = new ASMTreeBuilder(parser);
+            using (Stream output = File.Create("xasm.out"))
+            {
+                ASMEmitter emit = new ASMEmitter(builder,output);
+            }
         }
     }
 }

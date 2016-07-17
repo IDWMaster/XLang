@@ -6,17 +6,36 @@ using System.Threading.Tasks;
 using System.IO;
 namespace XLANG_Windows
 {
-    public class ASMEmitter
+    class ASMEmitter
     {
-        public ASMEmitter(Parser parser, Stream output)
+        public ASMEmitter(ASMTreeBuilder tree, Stream output)
         {
             BinaryWriter mwriter = new BinaryWriter(output);
-            mwriter.Write(0); //Version 0
-            //Emit all types
-            Scope scope = parser.MainMethod.Scope;
-            foreach(var iable in scope.types)
+            mwriter.Write(0); //XASM version 0
+            mwriter.Write(tree.Types.Count);
+            foreach (var type in tree.Types)
             {
-                
+                mwriter.Write(type.LibraryID);
+                mwriter.Write(type.Name);
+            }
+
+
+            mwriter.Write(tree.Functions.Count);
+            foreach(var iable in tree.Functions)
+            {
+                mwriter.Write(iable.Name); //Function name
+                mwriter.Write(iable.Arguments.Count); //Number of arguments
+                foreach(var gument in iable.Arguments)
+                {
+                    mwriter.Write(gument.LibraryID);
+                    mwriter.Write(gument.Name);
+                }
+                //Locals
+               foreach(var local in iable.LocalVariables)
+                {
+                    mwriter.Write(local.LibraryID);
+                    mwriter.Write(local.Name);
+                }
             }
         }
     }
