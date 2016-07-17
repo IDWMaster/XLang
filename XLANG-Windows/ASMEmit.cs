@@ -21,17 +21,17 @@ namespace XLANG_Windows
 
 
             mwriter.Write(tree.Functions.Count);
-            foreach(var iable in tree.Functions)
+            foreach (var iable in tree.Functions)
             {
                 mwriter.Write(iable.Name); //Function name
                 mwriter.Write(iable.Arguments.Count); //Number of arguments
-                foreach(var gument in iable.Arguments)
+                foreach (var gument in iable.Arguments)
                 {
                     mwriter.Write(gument.LibraryID);
                     mwriter.Write(gument.Name);
                 }
                 //Locals
-               foreach(var local in iable.LocalVariables)
+                foreach (var local in iable.LocalVariables)
                 {
                     mwriter.Write(local.LibraryID);
                     mwriter.Write(local.Name);

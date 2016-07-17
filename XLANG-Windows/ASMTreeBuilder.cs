@@ -42,6 +42,7 @@ namespace XLANG_Windows
                 mtype.Size = type.size;
                 mtype.IsStruct = type.isStruct;
                 mtype.Name = type.GetQualifiedName();
+                mtype.LibraryID = "";
                 ResolvedTypes[type] = mtype;
             }
             return ResolvedTypes[type];
