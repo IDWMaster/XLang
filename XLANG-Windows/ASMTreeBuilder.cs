@@ -130,11 +130,16 @@ namespace XLANG_Windows
 
             func.Bytecode = mstream.ToArray();
             Functions.Add(func);
+            foreach(var iable in pfunc.Scope.types)
+            {
+                Types.Add(Resolve(iable.Value.Resolve()));
+            }
         }
         public ASMTreeBuilder(Parser tree)
         {
             //Traverse each scope
             Function(tree.MainMethod);
+            
         }
     }
 }

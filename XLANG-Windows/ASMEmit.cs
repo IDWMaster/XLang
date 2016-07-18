@@ -17,6 +17,12 @@ namespace XLANG_Windows
             {
                 mwriter.Write(type.LibraryID);
                 mwriter.Write(type.Name);
+                mwriter.Write(type.IsStruct);
+                if(type.IsStruct)
+                {
+                    mwriter.Write(type.Size);
+                    mwriter.Write(type.Alignment);
+                }
             }
 
 
@@ -24,6 +30,7 @@ namespace XLANG_Windows
             foreach (var iable in tree.Functions)
             {
                 mwriter.Write(iable.Name); //Function name
+                mwriter.Write(iable.ReturnType.Name);
                 mwriter.Write(iable.Arguments.Count); //Number of arguments
                 foreach (var gument in iable.Arguments)
                 {
