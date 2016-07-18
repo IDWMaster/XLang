@@ -61,6 +61,13 @@ namespace XVM
                     outcode.Append(TranslateClassName(type)+" "+c+(c<argcount-1 ? ",":""));
                 }
                 outcode.AppendLine(") {");
+                int localcount = mreader.ReadInt32();
+                for(int c = 0;c<localcount;c++) //This is how C++ was invented.
+                {
+                    string libid = mreader.ReadString();
+                    string name = mreader.ReadString();
+                    outcode.AppendLine(TranslateClassName(name)+" l"+c+";");
+                }
                 outcode.AppendLine("}");
             }
             outcode.AppendLine("}");

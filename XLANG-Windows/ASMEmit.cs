@@ -37,6 +37,7 @@ namespace XLANG_Windows
                     mwriter.Write(gument.LibraryID);
                     mwriter.Write(gument.Name);
                 }
+                mwriter.Write(iable.LocalVariables.Count);
                 //Locals
                 foreach (var local in iable.LocalVariables)
                 {
