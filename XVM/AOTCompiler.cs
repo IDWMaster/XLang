@@ -11,6 +11,11 @@ namespace XVM
 
     class AOTCompiler
     {
+
+
+
+
+
         //Version 0 assembly format
         string TranslateClassName(string inputName)
         {
@@ -68,6 +73,8 @@ namespace XVM
                     string name = mreader.ReadString();
                     outcode.AppendLine(TranslateClassName(name)+" l"+c+";");
                 }
+                BinaryReader breader = new BinaryReader(new MemoryStream(mreader.ReadBytes(mreader.ReadInt32())));
+                new InstStream_Parser(breader);
                 outcode.AppendLine("}");
             }
             outcode.AppendLine("}");

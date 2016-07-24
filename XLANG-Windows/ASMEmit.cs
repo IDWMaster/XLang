@@ -44,6 +44,9 @@ namespace XLANG_Windows
                     mwriter.Write(local.LibraryID);
                     mwriter.Write(local.Name);
                 }
+                //Method body
+                mwriter.Write(iable.Bytecode.Length);
+                mwriter.Write(iable.Bytecode);
             }
         }
     }

@@ -80,7 +80,7 @@ namespace XLANG_Windows
                         if(exp.val is int)
                         {
                             mwriter.Write((byte)3);
-                            mwriter.Write("int");
+                            mwriter.Write(".int");
                             mwriter.Write(4);
                             mwriter.Write((int)exp.val);
                         }else

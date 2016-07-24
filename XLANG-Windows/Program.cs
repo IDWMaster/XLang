@@ -18,9 +18,10 @@ namespace XLANG_Windows
             string testProg = @"
              struct int 4.4 {
                  int +(int other);
-                 int -(int other);
-                 int *(int other);
-                 int /(int other);
+                 int -(int other); 
+                 int *(int other); 
+                 int /(int other); 
+                 int =(int other);
              }
              int x = 5;
 ";

@@ -268,9 +268,14 @@ namespace XLANG_Windows
     {
         public XFunction function;
         public List<Expression> arguments = new List<Expression>();
+        public override XType ResolveType()
+        {
+            return function.ReturnType;
+        }
     }
-    public class Expression : XObject
+    public abstract class Expression
     {
+        public abstract XType ResolveType();
     }
     public class VariableReferenceExpression : Expression
     {
@@ -278,6 +283,10 @@ namespace XLANG_Windows
         public VariableReferenceExpression(Variable variable)
         {
             this.variable = variable;
+        }
+        public override XType ResolveType()
+        {
+            return variable.Type;
         }
     }
 
@@ -296,11 +305,19 @@ namespace XLANG_Windows
         public FunctionCallExpression ToFunctionCall()
         {
             FunctionCallExpression espn = new FunctionCallExpression(); //Extra-sensory perception network
-            espn.function = new XFunction(op.ToString());
+            //TODO: Resolve function here
+            ResolvedType concrete = left.ResolveType().Resolve();
+            
+            espn.function = concrete.Functions[op.ToString()];
             espn.arguments.Add(left);
             espn.arguments.Add(right);
             return espn;
         }
+        public override XType ResolveType()
+        {
+            return ToFunctionCall().ResolveType();
+        }
+
 
     }
     public class ConstantExpression : Expression
@@ -309,6 +326,10 @@ namespace XLANG_Windows
         public ConstantExpression(object val)
         {
             this.val = val;
+        }
+        public override XType ResolveType()
+        {
+            throw new NotImplementedException();
         }
     }
     public class Parser
@@ -417,6 +438,7 @@ namespace XLANG_Windows
                     }
                     ptr.ReadWhitespace();
                     XFunction func = new XFunction(funcName);
+                    func.Scope.parent = type.scope;
                     func.ReturnType = new UnresolvedType(typename, func.Scope);
                     functionArgs(func);
                     type.Functions[funcName] = func;
@@ -443,7 +465,9 @@ namespace XLANG_Windows
         }
         ResolvedType Struct(Scope scope)
         {
+            scope = new Scope(scope);
             ResolvedType retval = new ResolvedType(ptr.ExpectIdentifier(),scope);
+            scope.Name = retval.Name;
             retval.isStruct = true;
             ptr.ReadWhitespace();
             ptr.Next();
