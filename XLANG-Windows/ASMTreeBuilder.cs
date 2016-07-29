@@ -110,7 +110,7 @@ namespace XLANG_Windows
         void Function(XFunction pfunc)
         {
             ASMFunction func = new ASMFunction();
-            func.Name = pfunc.Name;
+            func.Name = pfunc.GetQualifiedName();
             func.ReturnType = Resolve(pfunc.ReturnType.Resolve());
             
             foreach (var iable in pfunc.args)

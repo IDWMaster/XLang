@@ -45,7 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AOTCompiler.cs" />
+    <Compile Include="Builtins.cs" />
     <Compile Include="InstStream_Parser.cs" />
+    <Compile Include="Linker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

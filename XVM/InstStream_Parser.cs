@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 using System.IO;
 namespace XVM
 {
+    public class FunctionCallExpression:Expression
+    {
+        public FunctionInfo func;
+        public List<Expression> args = new List<Expression>();
+        public FunctionCallExpression(FunctionInfo info)
+        {
+            func = info;
+        }
+    }
     public class Expression
     {
         public string type;
@@ -34,7 +43,15 @@ namespace XVM
                         {
                             string library = mreader.ReadString(); //Library id
                             string name = mreader.ReadString();
-                            
+                            FunctionCallExpression exp = new FunctionCallExpression(Module.ResolveFunction(library,name));
+                            //TODO: Pop all arguments from the stack. We need to somehow resolve the function.
+                            for(int i = 0;i<exp.args.Count;i++)
+                            {
+                                Expression arg = stack.Pop();
+                                
+                            }
+                            expressions.Add(exp);
+                            stack.Push(exp);
                         }
                         break;
                     case 3:
