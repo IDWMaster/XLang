@@ -20,6 +20,7 @@ namespace XVM
     {
         public string Name;
         public List<TypeInfo> args = new List<TypeInfo>();
+        public bool Intrinsic = false;
     }
     
     public class Module
