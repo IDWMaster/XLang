@@ -43,7 +43,13 @@ namespace XLANG_Windows
                 mtype.IsStruct = type.isStruct;
                 mtype.Name = type.GetQualifiedName();
                 mtype.LibraryID = "";
+                
                 ResolvedTypes[type] = mtype;
+                //TODO: Add functions here
+                foreach (var func in type.Functions)
+                {
+                    Function(func.Value);
+                }
             }
             return ResolvedTypes[type];
         } 
@@ -107,7 +113,7 @@ namespace XLANG_Windows
             }
 
         }
-        void Function(XFunction pfunc)
+        ASMFunction Function(XFunction pfunc)
         {
             ASMFunction func = new ASMFunction();
             func.Name = pfunc.GetQualifiedName();
@@ -134,6 +140,7 @@ namespace XLANG_Windows
             {
                 Types.Add(Resolve(iable.Value.Resolve()));
             }
+            return func;
         }
         public ASMTreeBuilder(Parser tree)
         {
