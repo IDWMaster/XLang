@@ -23,6 +23,7 @@ namespace XVM
         }
         void VersionZero(BinaryReader mreader, StringBuilder outcode)
         {
+            Module.loadedModules[""] = new Module();
             int types = mreader.ReadInt32();
             for(int i = 0;i<types;i++)
             {
@@ -51,6 +52,8 @@ namespace XVM
             {
                 string methodName = mreader.ReadString();
                 string returnType = mreader.ReadString();
+                FunctionInfo info = new FunctionInfo();
+                Module.loadedModules[""].Functions[methodName] = info;
                 if(methodName == "")
                 {
                     outcode.AppendLine("public static void Main(");
