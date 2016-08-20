@@ -20,17 +20,29 @@ namespace XVM
     {
         public string Name;
         public List<TypeInfo> args = new List<TypeInfo>();
-        public bool Intrinsic = false;
+        
+    }
+    public class BinaryIntrinsic:FunctionInfo
+    {
+        public BinaryIntrinsic(TypeInfo left, TypeInfo right)
+        {
+            args.Add(left);
+            args.Add(right);
+        }
     }
     
     public class Module
     {
         public static Dictionary<string, Module> loadedModules = new Dictionary<string, Module>();
-        public Dictionary<string, Type> Types = new Dictionary<string, Type>();
+        public Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>();
         public Dictionary<string, FunctionInfo> Functions = new Dictionary<string, FunctionInfo>();
         public static FunctionInfo ResolveFunction(string module, string function)
         {
             return loadedModules[module].Functions[function];
+        }
+        public static TypeInfo ResolveType(string module, string type)
+        {
+            return loadedModules[module].Types[module];
         }
     }
 }

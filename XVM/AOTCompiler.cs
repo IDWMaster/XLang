@@ -40,6 +40,7 @@ namespace XVM
                     }
                     outcode.AppendLine("public struct " + TranslateClassName(name) + " {");
                     outcode.AppendLine("}");
+                    
                 }else
                 {
                     throw new Exception("Not Yet Implemented");
@@ -47,7 +48,7 @@ namespace XVM
             }
             outcode.AppendLine("public class XLang_Methods {");
             int methods = mreader.ReadInt32();
-
+            Builtins.init();
             for(int i = 0;i<methods;i++)
             {
                 string methodName = mreader.ReadString();

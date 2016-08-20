@@ -13,7 +13,12 @@ namespace XVM
         {
             var module = new Module();
             Module.loadedModules[""] = module;
-            
+            TypeInfo XInt = Module.ResolveType("", "int");
+            module.Functions["int.="] = new BinaryIntrinsic(XInt, XInt);
+            module.Functions["int.+"] = new BinaryIntrinsic(XInt, XInt);
+            module.Functions["int.-"] = new BinaryIntrinsic(XInt, XInt);
+            module.Functions["int.*"] = new BinaryIntrinsic(XInt, XInt);
+            module.Functions["int./"] = new BinaryIntrinsic(XInt, XInt);
         }
     }
 }
